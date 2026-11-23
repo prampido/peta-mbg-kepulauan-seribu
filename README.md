@@ -75,4 +75,4 @@ Pido, P. P. S. (2026). *Peta interaktif jaringan pasok dan SPPG Program Makan Be
 - Teks dan `index.html`: CC BY 4.0.
 - `lib/`: MapLibre GL JS, BSD-3-Clause (lihat `lib/LICENSE.txt`).
 
-Kredit peta interaktif: peta dasar © kontributor OpenStreetMap (ubin standar openstreetmap.org); citra © Esri, Maxar, Earthstar Geographics.
+Kredit peta interaktif: peta dasar © kontributor OpenStreetMap © CARTO (cadangan: ubin standar OpenStreetMap); citra © Esri, Maxar, Earthstar Geographics.
