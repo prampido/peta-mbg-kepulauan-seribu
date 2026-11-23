@@ -8,6 +8,14 @@ authors:
     orcid: "https://orcid.org/0009-0001-7759-2150"
     affiliation: "Department of Geography, Faculty of Mathematics and Natural Sciences, Universitas Indonesia"
 version: pram-v1.0.0
+doi: 10.5281/zenodo.24453200
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24453199
+    description: "DOI Zenodo untuk semua versi"
+  - type: doi
+    value: 10.5281/zenodo.24453200
+    description: "DOI Zenodo untuk versi pram-v1.0.0"
 date-released: 2026-11-23
 license: ODbL-1.0
 url: "https://prampido.github.io/peta-mbg-kepulauan-seribu/"

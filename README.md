@@ -5,7 +5,7 @@ Peta interaktif dan data spasial Satuan Pelayanan Pemenuhan Gizi (SPPG) Program 
 Pramono Pido, Departemen Geografi, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Indonesia.
 Halaman statis (MapLibre GL JS), terbuka tanpa akun: https://prampido.github.io/peta-mbg-kepulauan-seribu/
 
-DOI Zenodo (semua versi): akan diisi setelah rilis pertama.
+DOI Zenodo (semua versi): [10.5281/zenodo.24453199](https://doi.org/10.5281/zenodo.24453199). Versi pram-v1.0.0: [10.5281/zenodo.24453200](https://doi.org/10.5281/zenodo.24453200).
 
 Data ini disusun sebagai bahan esai mata kuliah Dinamika Spasial Sosial Ekonomi (SCGE801103), Departemen Geografi FMIPA UI.
 
@@ -67,7 +67,7 @@ Keterangan kolom:
 
 ## Cara mengutip
 
-Pido, P. P. S. (2026). *Peta interaktif jaringan pasok dan SPPG Program Makan Bergizi Gratis di Kabupaten Administrasi Kepulauan Seribu* (Versi pram-v1.0.0) [Data set]. Zenodo. DOI akan diisi setelah rilis.
+Pido, P. P. S. (2026). *Peta interaktif jaringan pasok dan SPPG Program Makan Bergizi Gratis di Kabupaten Administrasi Kepulauan Seribu* (Versi pram-v1.0.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.24453200
 
 ## Lisensi
 
