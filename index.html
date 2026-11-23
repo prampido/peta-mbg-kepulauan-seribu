@@ -7,7 +7,7 @@
 <title>Peta MBG Kepulauan Seribu</title>
 <meta name="description" content="Peta interaktif SPPG Program Makan Bergizi Gratis, pulau layanan, dermaga, dan rute kapal di Kabupaten Administrasi Kepulauan Seribu. Pramono Pido, Departemen Geografi FMIPA UI.">
 <meta name="author" content="Pramono Pido">
-<link rel="stylesheet" href="lib/maplibre-gl.css?v=20261123c">
+<link rel="stylesheet" href="lib/maplibre-gl.css?v=20261123d">
 <style>
   :root{
     --laut:#0f2a3c; --laut2:#173a50; --krem:#f4ede0; --emas:#e0ae45;
@@ -20,7 +20,7 @@
   html,body{margin:0;height:100%;background:var(--laut);color:var(--krem);
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
   #peta{position:absolute;inset:0}
-  .panel{position:absolute;top:12px;left:12px;width:340px;max-height:calc(100% - 24px);overflow:auto;
+  .panel{position:absolute;top:12px;left:12px;width:360px;max-height:calc(100% - 24px);overflow:auto;
     background:rgba(15,42,60,.95);border:1px solid rgba(224,174,69,.5);border-radius:12px;padding:16px 16px 12px;
     box-shadow:0 6px 24px rgba(0,0,0,.35);z-index:2}
   .kicker{font-size:11px;letter-spacing:.12em;font-weight:700;color:var(--emas);margin:0 0 4px}
@@ -52,6 +52,8 @@
   .pembuat img{width:46px;height:auto;flex:none}
   .pembuat .nama{font-size:14px;font-weight:700;margin:0 0 2px}
   .pembuat .afiliasi{font-size:12px;line-height:1.4;margin:0;opacity:.9}
+  .pembuat>div{flex:1;min-width:0}
+  .pembuat .afiliasi .baris{display:block;white-space:nowrap}
   .label-pulau{pointer-events:none;text-align:center;font-weight:700;font-size:12px;color:#1d2a33;
     text-shadow:0 0 2px #fff,0 0 4px #fff,0 0 6px #fff;white-space:nowrap;line-height:1.15}
   .label-pulau small{display:block;font-weight:600;font-size:10px;color:#4a3a7a}
@@ -130,19 +132,19 @@
   </ul></div>
 
   <div class="pembuat">
-    <img src="img/logo-fmipa-ui.png?v=20261123c" alt="Logo Fakultas Matematika dan Ilmu Pengetahuan Alam Universitas Indonesia">
+    <img src="img/logo-fmipa-ui.png?v=20261123d" alt="Logo Fakultas Matematika dan Ilmu Pengetahuan Alam Universitas Indonesia">
     <div>
       <p class="nama">Pramono Pido</p>
-      <p class="afiliasi">Departemen Geografi, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Indonesia</p>
+      <p class="afiliasi" id="afiliasi"><span class="baris">Departemen Geografi</span><span class="baris">Fakultas Matematika dan Ilmu Pengetahuan Alam</span><span class="baris">Universitas Indonesia</span></p>
     </div>
   </div>
   <p class="kredit">Data dan metode: <a href="https://github.com/prampido/peta-mbg-kepulauan-seribu">github.com/prampido/peta-mbg-kepulauan-seribu</a></p>
   <p class="kredit">Data: © kontributor OpenStreetMap (ODbL) · Google Open Buildings v3 (CC BY 4.0) · VIIRS VNL V2.2, Earth Observation Group (CC BY 4.0) · Informasi SPPG dari situs Pemkab Kepulauan Seribu · Peta dasar © kontributor OpenStreetMap © CARTO · Citra © Esri</p>
 </aside>
-<script src="lib/maplibre-gl.js?v=20261123c"></script>
+<script src="lib/maplibre-gl.js?v=20261123d"></script>
 <script>
 (function(){
-  var V='?v=20261123c';
+  var V='?v=20261123d';
   var WARNA_KELAS={permukiman:'#5F4690',terbatas:'#38A6A5',migas:'#E17C05',kosong:'#A9A9A9'};
   var WARNA_VER={terverifikasi:'#C81E2D',sebagian:'#E8743B',belum:'#F2B701'};
   var TEKS_VER={terverifikasi:'Terkonfirmasi situs resmi Pemkab',sebagian:'Layanan terkonfirmasi, unit dari direktori',belum:'Belum terverifikasi'};
@@ -186,7 +188,7 @@
   function ang(v,d){return v==null?'-':Number(v).toLocaleString('id-ID',{maximumFractionDigits:d==null?1:d});}
   function kecil(){return window.innerWidth<=640;}
   function padding(){
-    return kecil()?{top:30,bottom:Math.round(window.innerHeight*0.5)+10,left:20,right:60}:{top:40,bottom:40,left:380,right:60};
+    return kecil()?{top:30,bottom:Math.round(window.innerHeight*0.5)+10,left:20,right:60}:{top:40,bottom:40,left:400,right:60};
   }
   var popup=null;
   function buka(ll,html){ if(popup) popup.remove(); popup=new maplibregl.Popup({maxWidth:'290px'}).setLngLat(ll).setHTML(html).addTo(map); }
@@ -348,6 +350,16 @@
     rad=!rad; tekan('b-radius',rad);
     map.setLayoutProperty('radius-garis','visibility',rad?'visible':'none');
   };
+  // Afiliasi: tiap baris tetap satu baris; huruf dikecilkan sedikit bila kurang lebar.
+  function pasAfiliasi(){
+    var p=document.getElementById('afiliasi'), baris=p.querySelectorAll('.baris'), f=12;
+    p.style.fontSize=f+'px';
+    function lebih(){ for(var i=0;i<baris.length;i++){ if(baris[i].scrollWidth>baris[i].clientWidth+0.5) return true; } return false; }
+    while(lebih()&&f>9){ f-=0.25; p.style.fontSize=f+'px'; }
+  }
+  pasAfiliasi();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(pasAfiliasi);
+  window.addEventListener('resize',pasAfiliasi);
   var panel=document.getElementById('panel'), lipat=document.getElementById('lipat');
   function tutup(t){ panel.classList.toggle('tertutup',t); document.body.classList.toggle('panel-tutup',t); lipat.textContent=t?'Buka':'Tutup'; lipat.setAttribute('aria-expanded',t?'false':'true'); }
   lipat.onclick=function(){ tutup(!panel.classList.contains('tertutup')); };
