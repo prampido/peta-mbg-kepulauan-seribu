@@ -7,7 +7,7 @@
 <title>Peta MBG Kepulauan Seribu</title>
 <meta name="description" content="Peta interaktif SPPG Program Makan Bergizi Gratis, pulau layanan, dermaga, dan rute kapal di Kabupaten Administrasi Kepulauan Seribu. Pramono Pido, Departemen Geografi FMIPA UI.">
 <meta name="author" content="Pramono Pido">
-<link rel="stylesheet" href="lib/maplibre-gl.css?v=20261123a">
+<link rel="stylesheet" href="lib/maplibre-gl.css?v=20261123b">
 <style>
   :root{
     --laut:#0f2a3c; --laut2:#173a50; --krem:#f4ede0; --emas:#e0ae45;
@@ -130,19 +130,19 @@
   </ul></div>
 
   <div class="pembuat">
-    <img src="img/logo-fmipa-ui.png?v=20261123a" alt="Logo Fakultas Matematika dan Ilmu Pengetahuan Alam Universitas Indonesia">
+    <img src="img/logo-fmipa-ui.png?v=20261123b" alt="Logo Fakultas Matematika dan Ilmu Pengetahuan Alam Universitas Indonesia">
     <div>
       <p class="nama">Pramono Pido</p>
       <p class="afiliasi">Departemen Geografi, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Indonesia</p>
     </div>
   </div>
   <p class="kredit">Data dan metode: <a href="https://github.com/prampido/peta-mbg-kepulauan-seribu">github.com/prampido/peta-mbg-kepulauan-seribu</a></p>
-  <p class="kredit">Data: © kontributor OpenStreetMap (ODbL) · Google Open Buildings v3 (CC BY 4.0) · VIIRS VNL V2.2, Earth Observation Group (CC BY 4.0) · Informasi SPPG dari situs Pemkab Kepulauan Seribu · Peta dasar © kontributor OpenStreetMap © CARTO · Citra © Esri</p>
+  <p class="kredit">Data: © kontributor OpenStreetMap (ODbL) · Google Open Buildings v3 (CC BY 4.0) · VIIRS VNL V2.2, Earth Observation Group (CC BY 4.0) · Informasi SPPG dari situs Pemkab Kepulauan Seribu · Peta dasar © kontributor OpenStreetMap · Citra © Esri</p>
 </aside>
-<script src="lib/maplibre-gl.js?v=20261123a"></script>
+<script src="lib/maplibre-gl.js?v=20261123b"></script>
 <script>
 (function(){
-  var V='?v=20261123a';
+  var V='?v=20261123b';
   var WARNA_KELAS={permukiman:'#5F4690',terbatas:'#38A6A5',migas:'#E17C05',kosong:'#A9A9A9'};
   var WARNA_VER={terverifikasi:'#C81E2D',sebagian:'#E8743B',belum:'#F2B701'};
   var TEKS_VER={terverifikasi:'Terkonfirmasi situs resmi Pemkab',sebagian:'Layanan terkonfirmasi, unit dari direktori',belum:'Belum terverifikasi'};
@@ -151,16 +151,16 @@
   var style={
     version:8,
     sources:{
-      peta:{type:'raster',tileSize:256,maxzoom:20,
-        tiles:['a','b','c','d'].map(function(s){return 'https://'+s+'.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png';}),
-        attribution:'© <a href="https://www.openstreetmap.org/copyright">kontributor OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'},
+      peta:{type:'raster',tileSize:256,maxzoom:19,
+        tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        attribution:'© <a href="https://www.openstreetmap.org/copyright">kontributor OpenStreetMap</a>'},
       satelit:{type:'raster',tileSize:256,maxzoom:19,
         tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
         attribution:'Citra © Esri, Maxar, Earthstar Geographics'}
     },
     layers:[
       {id:'latar',type:'background',paint:{'background-color':'#dfe8ee'}},
-      {id:'peta',type:'raster',source:'peta'},
+      {id:'peta',type:'raster',source:'peta',paint:{'raster-saturation':-0.6,'raster-contrast':-0.1,'raster-opacity':0.9}},
       {id:'satelit',type:'raster',source:'satelit',layout:{visibility:'none'}}
     ]
   };
@@ -248,7 +248,7 @@
       });
       function aturLabel(){
         var z=map.getZoom();
-        labelKel.forEach(function(el){ el.style.display=z<11.3?'':'none'; });
+        labelKel.forEach(function(el){ el.style.display=(z>=9.8&&z<11.3)?'':'none'; });
         labelDarat.forEach(function(el){ el.style.display=z<13?'':'none'; });
         label.forEach(function(el){ el.style.display=z<11.3?'none':''; el.querySelector('small').style.display=z<12.5?'none':''; });
       }
