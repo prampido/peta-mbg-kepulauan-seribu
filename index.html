@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Peta MBG Kepulauan Seribu</title>
+<meta name="description" content="Peta interaktif SPPG Program Makan Bergizi Gratis, pulau layanan, dermaga, dan rute kapal di Kabupaten Administrasi Kepulauan Seribu. Pramono Pido, Departemen Geografi FMIPA UI.">
+<meta name="author" content="Pramono Pido">
+<link rel="stylesheet" href="lib/maplibre-gl.css?v=20261123a">
+<style>
+  :root{
+    --laut:#0f2a3c; --laut2:#173a50; --krem:#f4ede0; --emas:#e0ae45;
+    --perm:#5F4690; --terbatas:#38A6A5; --migas:#E17C05; --kosong:#A9A9A9;
+    --utara:#2c7fb8; --selatan:#d95f0e;
+    --v1:#C81E2D; --v2:#E8743B; --v3:#F2B701;
+    --dalam:#C81E2D; --luar:#7B3294; --dermaga:#1F4E79;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--laut);color:var(--krem);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+  #peta{position:absolute;inset:0}
+  .panel{position:absolute;top:12px;left:12px;width:340px;max-height:calc(100% - 24px);overflow:auto;
+    background:rgba(15,42,60,.95);border:1px solid rgba(224,174,69,.5);border-radius:12px;padding:16px 16px 12px;
+    box-shadow:0 6px 24px rgba(0,0,0,.35);z-index:2}
+  .kicker{font-size:11px;letter-spacing:.12em;font-weight:700;color:var(--emas);margin:0 0 4px}
+  h1{font-size:21px;line-height:1.2;margin:0 0 8px}
+  h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--emas);margin:14px 0 6px}
+  p{font-size:13.5px;line-height:1.5;margin:0 0 10px}
+  .tombol{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 6px}
+  .tombol button{flex:1 1 auto;font:inherit;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;cursor:pointer;
+    border:1px solid var(--emas);background:transparent;color:var(--krem)}
+  .tombol button[aria-pressed="true"]{background:var(--emas);color:var(--laut)}
+  .tombol button:focus-visible{outline:2px solid var(--krem);outline-offset:2px}
+  ol.sppg{list-style:none;padding:0;margin:0 0 6px}
+  ol.sppg button{width:100%;text-align:left;font:inherit;font-size:13.5px;color:var(--krem);background:rgba(255,255,255,.05);
+    border:0;border-left:4px solid var(--v1);border-radius:6px;padding:7px 10px;margin:0 0 5px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  ol.sppg button:hover,ol.sppg button:focus-visible{background:rgba(224,174,69,.18);outline:none}
+  ol.sppg .status{font-size:11.5px;white-space:nowrap;opacity:.9}
+  .legenda{display:grid;grid-template-columns:22px 1fr;gap:6px 8px;align-items:center;font-size:12.5px;margin:4px 0 8px}
+  .legenda[hidden]{display:none}
+  .sw{width:20px;height:12px;border-radius:2px}
+  .bulat{width:12px;height:12px;border-radius:50%;border:2px solid #fff;justify-self:center}
+  .garis{height:0;border-top:3px solid}
+  .catatan{font-size:11.5px;opacity:.85}
+  .catatan li{margin:0 0 4px}
+  .catatan ul{padding-left:18px;margin:4px 0 10px}
+  .kredit{font-size:10.5px;color:var(--emas);opacity:.9;line-height:1.45}
+  .kredit a,.panel a{color:var(--emas)}
+  .lipat{display:none}
+  .pembuat{display:flex;gap:12px;align-items:center;border-top:1px solid rgba(224,174,69,.35);padding-top:12px;margin:8px 0 10px}
+  .pembuat img{width:46px;height:auto;flex:none}
+  .pembuat .nama{font-size:14px;font-weight:700;margin:0 0 2px}
+  .pembuat .afiliasi{font-size:12px;line-height:1.4;margin:0;opacity:.9}
+  .label-pulau{pointer-events:none;text-align:center;font-weight:700;font-size:12px;color:#1d2a33;
+    text-shadow:0 0 2px #fff,0 0 4px #fff,0 0 6px #fff;white-space:nowrap;line-height:1.15}
+  .label-pulau small{display:block;font-weight:600;font-size:10px;color:#4a3a7a}
+  .label-kel{pointer-events:none;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#0f2a3c;
+    text-shadow:0 0 2px #fff,0 0 4px #fff,0 0 6px #fff;white-space:nowrap;line-height:1.2}
+  .label-kel.daratan{color:#1F4E79;text-transform:none;letter-spacing:0;font-size:12px}
+  body.satelit .label-pulau,body.satelit .label-kel{color:#fff;text-shadow:0 0 3px #000,0 0 6px #000}
+  body.satelit .label-pulau small{color:var(--emas)}
+  .maplibregl-popup-content{background:var(--laut);color:var(--krem);border:1px solid var(--emas);border-radius:8px;font-size:13px;line-height:1.45}
+  .maplibregl-popup-content small{opacity:.85}
+  .maplibregl-popup-tip{border-top-color:var(--emas)!important;border-bottom-color:var(--emas)!important}
+  .maplibregl-popup-close-button{color:var(--krem);font-size:18px}
+  @media (max-width:640px){
+    .panel{top:auto;bottom:0;left:0;right:0;width:auto;max-height:52%;border-radius:14px 14px 0 0;padding:12px 16px calc(10px + env(safe-area-inset-bottom))}
+    h1{font-size:18px;padding-right:64px}
+    .lipat{display:block;position:absolute;right:12px;top:10px;font:inherit;font-size:12px;background:transparent;color:var(--emas);border:1px solid var(--emas);border-radius:6px;padding:4px 8px}
+    .panel.tertutup{max-height:96px;overflow:hidden}
+    .maplibregl-ctrl-bottom-right,.maplibregl-ctrl-bottom-left{bottom:calc(52% + 4px)}
+    body.panel-tutup .maplibregl-ctrl-bottom-right,body.panel-tutup .maplibregl-ctrl-bottom-left{bottom:96px}
+  }
+</style>
+</head>
+<body>
+<div id="peta" role="application" aria-label="Peta interaktif SPPG dan jaringan pasok Kepulauan Seribu"></div>
+<aside class="panel" id="panel">
+  <button class="lipat" id="lipat" aria-expanded="true">Tutup</button>
+  <div class="kicker">MBG DI KEPULAUAN SERIBU</div>
+  <h1>Dapur MBG dan jalur kapal di Kepulauan Seribu</h1>
+  <p>Peta ini menunjukkan tujuh Satuan Pelayanan Pemenuhan Gizi (SPPG) Program Makan Bergizi Gratis, pulau yang dilayaninya, dermaga, dan rute kapal yang menghubungkan pulau-pulau di Kabupaten Administrasi Kepulauan Seribu dengan daratan Jakarta.</p>
+  <div class="tombol" role="group" aria-label="Peta dasar">
+    <button id="b-peta" aria-pressed="true">Peta</button>
+    <button id="b-satelit" aria-pressed="false">Satelit</button>
+    <button id="b-semua" aria-pressed="false">Seluruh kabupaten</button>
+  </div>
+  <div class="tombol" role="group" aria-label="Lapisan">
+    <button id="b-kelas" aria-pressed="true">Warna: kelas pulau</button>
+    <button id="b-kec" aria-pressed="false">Warna: kecamatan</button>
+    <button id="b-radius" aria-pressed="false">Radius 6 km</button>
+  </div>
+
+  <h2>Tujuh SPPG</h2>
+  <ol class="sppg" id="daftar"></ol>
+
+  <h2>Legenda</h2>
+  <div class="legenda" id="leg-kelas">
+    <span class="sw" style="background:var(--perm)"></span><span>Pulau permukiman (≥50 bangunan)</span>
+    <span class="sw" style="background:var(--terbatas)"></span><span>Bangunan terbatas</span>
+    <span class="sw" style="background:var(--migas)"></span><span>Fasilitas migas lepas pantai</span>
+    <span class="sw" style="background:var(--kosong)"></span><span>Tidak/hampir tidak berbangunan</span>
+  </div>
+  <div class="legenda" id="leg-kec" hidden>
+    <span class="sw" style="background:var(--utara)"></span><span>Kec. Kepulauan Seribu Utara</span>
+    <span class="sw" style="background:var(--selatan)"></span><span>Kec. Kepulauan Seribu Selatan</span>
+    <span class="sw" style="background:var(--kosong)"></span><span>Di luar batas kelurahan OSM</span>
+  </div>
+  <div class="legenda">
+    <span class="bulat" style="background:var(--v1)"></span><span>SPPG terkonfirmasi situs resmi Pemkab</span>
+    <span class="bulat" style="background:var(--v2)"></span><span>Layanan terkonfirmasi, unit dari direktori</span>
+    <span class="bulat" style="background:var(--v3)"></span><span>SPPG belum terverifikasi</span>
+    <span class="bulat" style="background:var(--dermaga);border-radius:2px"></span><span>Dermaga / pelabuhan</span>
+    <span class="garis" style="border-color:#2b2b2b"></span><span>Rute kapal Dishub (garis lurus, skematik)</span>
+    <span class="garis" style="border-color:#B07AA1"></span><span>Perahu rakyat Tanjung Pasir (skematik)</span>
+    <span class="garis" style="border-color:#7a7a7a;border-top-style:dashed"></span><span>Lanjutan ke pulau terluar</span>
+    <span class="garis" style="border-color:var(--dalam);border-top-style:dotted"></span><span>SPPG ke pulau layanan, ≤6 km</span>
+    <span class="garis" style="border-color:var(--luar);border-top-style:dotted"></span><span>SPPG ke pulau layanan, &gt;6 km</span>
+  </div>
+  <p class="catatan">Pada skala kecil, lingkaran di atas pulau menunjukkan jumlah bangunan (Google Open Buildings v3). Klik pulau, dermaga, rute, atau SPPG untuk rinciannya.</p>
+
+  <h2>Catatan</h2>
+  <div class="catatan"><ul>
+    <li>Titik SPPG adalah pusat pulau (perkiraan), bukan alamat dapur.</li>
+    <li>SPPG Tidung dan Pari baru tercatat di direktori pihak ketiga dan belum dicek di Radar MBG BGN.</li>
+    <li>Rute adalah garis lurus antar-dermaga, bukan lintasan kapal, dan belum dicocokkan dengan jadwal Dishub DKI.</li>
+    <li>Pulau layanan diasumsikan satu kelurahan dengan SPPG. Radius 6 km mengacu pada juknis BGN.</li>
+    <li>Luas pulau dari OpenStreetMap (11,27 km²) lebih besar dari angka BPS (8,69 km²). Untuk luas resmi, pakai BPS.</li>
+  </ul></div>
+
+  <div class="pembuat">
+    <img src="img/logo-fmipa-ui.png?v=20261123a" alt="Logo Fakultas Matematika dan Ilmu Pengetahuan Alam Universitas Indonesia">
+    <div>
+      <p class="nama">Pramono Pido</p>
+      <p class="afiliasi">Departemen Geografi, Fakultas Matematika dan Ilmu Pengetahuan Alam, Universitas Indonesia</p>
+    </div>
+  </div>
+  <p class="kredit">Data dan metode: <a href="https://github.com/prampido/peta-mbg-kepulauan-seribu">github.com/prampido/peta-mbg-kepulauan-seribu</a></p>
+  <p class="kredit">Data: © kontributor OpenStreetMap (ODbL) · Google Open Buildings v3 (CC BY 4.0) · VIIRS VNL V2.2, Earth Observation Group (CC BY 4.0) · Informasi SPPG dari situs Pemkab Kepulauan Seribu · Peta dasar © kontributor OpenStreetMap © CARTO · Citra © Esri</p>
+</aside>
+<script src="lib/maplibre-gl.js?v=20261123a"></script>
+<script>
+(function(){
+  var V='?v=20261123a';
+  var WARNA_KELAS={permukiman:'#5F4690',terbatas:'#38A6A5',migas:'#E17C05',kosong:'#A9A9A9'};
+  var WARNA_VER={terverifikasi:'#C81E2D',sebagian:'#E8743B',belum:'#F2B701'};
+  var TEKS_VER={terverifikasi:'Terkonfirmasi situs resmi Pemkab',sebagian:'Layanan terkonfirmasi, unit dari direktori',belum:'Belum terverifikasi'};
+  var AWAL=[[106.44,-6.125],[106.83,-5.62]], SEMUA=[[106.36,-6.125],[106.83,-5.19]];
+
+  var style={
+    version:8,
+    sources:{
+      peta:{type:'raster',tileSize:256,maxzoom:20,
+        tiles:['a','b','c','d'].map(function(s){return 'https://'+s+'.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png';}),
+        attribution:'© <a href="https://www.openstreetmap.org/copyright">kontributor OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'},
+      satelit:{type:'raster',tileSize:256,maxzoom:19,
+        tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+        attribution:'Citra © Esri, Maxar, Earthstar Geographics'}
+    },
+    layers:[
+      {id:'latar',type:'background',paint:{'background-color':'#dfe8ee'}},
+      {id:'peta',type:'raster',source:'peta'},
+      {id:'satelit',type:'raster',source:'satelit',layout:{visibility:'none'}}
+    ]
+  };
+  var map=new maplibregl.Map({container:'peta',style:style,bounds:AWAL,maxPitch:0,dragRotate:false,attributionControl:{compact:true}});
+  map.touchZoomRotate.disableRotation();
+  map.addControl(new maplibregl.NavigationControl({showCompass:false}),'bottom-right');
+  map.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-right');
+
+  function getJSON(u){return fetch(u+V).then(function(r){if(!r.ok) throw new Error(u); return r.json();});}
+  function esc(s){return String(s==null?'-':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function ang(v,d){return v==null?'-':Number(v).toLocaleString('id-ID',{maximumFractionDigits:d==null?1:d});}
+  function kecil(){return window.innerWidth<=640;}
+  function padding(){
+    return kecil()?{top:30,bottom:Math.round(window.innerHeight*0.5)+10,left:20,right:60}:{top:40,bottom:40,left:380,right:60};
+  }
+  var popup=null;
+  function buka(ll,html){ if(popup) popup.remove(); popup=new maplibregl.Popup({maxWidth:'290px'}).setLngLat(ll).setHTML(html).addTo(map); }
+
+  var EKS_KELAS=['match',['get','kode_kelas'],'permukiman',WARNA_KELAS.permukiman,'terbatas',WARNA_KELAS.terbatas,'migas',WARNA_KELAS.migas,WARNA_KELAS.kosong];
+  var EKS_KEC=['match',['coalesce',['get','kecamatan'],''],'Kepulauan Seribu Utara','#2c7fb8','Kepulauan Seribu Selatan','#d95f0e','#A9A9A9'];
+
+  function mulai(){
+    Promise.all([
+      getJSON('data/pulau.geojson'), getJSON('data/sppg.geojson'), getJSON('data/dermaga.geojson'),
+      getJSON('data/rute_skematik.geojson'), getJSON('data/layanan_sppg.geojson'), getJSON('data/radius_6km.geojson')
+    ]).then(function(d){
+      var pulau=d[0], sppg=d[1], dermaga=d[2], rute=d[3], layanan=d[4], radius=d[5];
+      var titik={type:'FeatureCollection',features:pulau.features.filter(function(f){return f.properties.kode_kelas!=='kosong';}).map(function(f){
+        return {type:'Feature',properties:f.properties,geometry:{type:'Point',coordinates:[f.properties.lon_titik,f.properties.lat_titik]}};
+      })};
+      map.addSource('pulau',{type:'geojson',data:pulau});
+      map.addSource('titik',{type:'geojson',data:titik});
+      map.addSource('sppg',{type:'geojson',data:sppg});
+      map.addSource('dermaga',{type:'geojson',data:dermaga});
+      map.addSource('rute',{type:'geojson',data:rute});
+      map.addSource('layanan',{type:'geojson',data:layanan});
+      map.addSource('radius',{type:'geojson',data:radius});
+
+      map.addLayer({id:'radius-garis',type:'line',source:'radius',layout:{visibility:'none'},paint:{'line-color':'#C81E2D','line-width':1.4,'line-dasharray':[4,3],'line-opacity':0.8}});
+      map.addLayer({id:'pulau',type:'fill',source:'pulau',paint:{'fill-color':EKS_KELAS,'fill-opacity':0.85}});
+      map.addLayer({id:'pulau-garis',type:'line',source:'pulau',paint:{'line-color':'#333','line-width':['interpolate',['linear'],['zoom'],9,0.3,14,1]}});
+      map.addLayer({id:'rute-halo',type:'line',source:'rute',layout:{'line-cap':'round'},paint:{'line-color':'#fff','line-width':5,'line-opacity':0.6}});
+      map.addLayer({id:'rute',type:'line',source:'rute',filter:['!=',['get','layanan'],'Lanjutan ke pulau terluar'],layout:{'line-cap':'round'},paint:{
+        'line-color':['match',['get','layanan'],'Perahu rakyat','#B07AA1','#2b2b2b'],'line-width':2.2}});
+      map.addLayer({id:'rute-lanjut',type:'line',source:'rute',filter:['==',['get','layanan'],'Lanjutan ke pulau terluar'],paint:{
+        'line-color':'#7a7a7a','line-width':2.2,'line-dasharray':[3,2]}});
+      map.addLayer({id:'layanan',type:'line',source:'layanan',layout:{'line-cap':'round'},paint:{
+        'line-color':['case',['get','di_luar_6km'],'#7B3294','#C81E2D'],'line-width':2.4,'line-dasharray':[0.6,1.6]}});
+      map.addLayer({id:'titik',type:'circle',source:'titik',maxzoom:12.5,paint:{
+        'circle-color':EKS_KELAS,'circle-opacity':0.55,'circle-stroke-color':'#fff','circle-stroke-width':1,
+        'circle-radius':['interpolate',['linear'],['sqrt',['get','n_bangunan']],0,2,7,4,38,14]}});
+      map.addLayer({id:'dermaga',type:'circle',source:'dermaga',paint:{
+        'circle-color':'#1F4E79','circle-stroke-color':'#fff','circle-stroke-width':1.5,
+        'circle-radius':['case',['get','daratan'],6,4]}});
+      map.addLayer({id:'sppg-halo',type:'circle',source:'sppg',paint:{'circle-color':'#fff','circle-radius':11,'circle-opacity':0.85}});
+      map.addLayer({id:'sppg',type:'circle',source:'sppg',paint:{
+        'circle-color':['match',['get','kode_verifikasi'],'terverifikasi',WARNA_VER.terverifikasi,'sebagian',WARNA_VER.sebagian,WARNA_VER.belum],
+        'circle-radius':8,'circle-stroke-color':'#1d2a33','circle-stroke-width':1.5}});
+
+      // label: kelurahan & daratan di skala kecil, nama pulau di skala besar
+      function pasang(ll,html,cls,anchor,offset){
+        var el=document.createElement('div'); el.className=cls; el.innerHTML=html;
+        new maplibregl.Marker({element:el,anchor:anchor,offset:offset}).setLngLat(ll).addTo(map);
+        return el;
+      }
+      var hp=kecil();
+      var labelKel=[
+        [[106.5766,-5.6522],'Pulau Harapan','left',[14,-4]],
+        [[106.5682,-5.6544],'Pulau Kelapa','right',[-14,6]],
+        [[106.6076,-5.7429],'Pulau Panggang','left',[18,0]],
+        [[106.4985,-5.7985],'Pulau Tidung','bottom',[0,-14]],
+        [[106.6164,-5.8591],'Pulau Pari','left',[16,0]],
+        [[106.7074,-5.9779],'Pulau Untung Jawa',hp?'right':'left',hp?[-14,0]:[16,0]]
+      ].map(function(a){return pasang(a[0],'Kel. '+esc(hp?a[1].replace(/^Pulau /,''):a[1]),'label-kel',a[2],a[3]);});
+      var labelDarat=[
+        pasang([106.7715,-6.1047],'Kali Adem · Muara Angke','label-kel daratan',hp?'right':'left',hp?[-10,-2]:[12,0]),
+        pasang([106.6618,-6.0291],'Tanjung Pasir','label-kel daratan','right',[-10,0])
+      ];
+      var label=[];
+      pulau.features.forEach(function(f){
+        var p=f.properties; if(p.kode_kelas!=='permukiman'&&p.kode_kelas!=='migas') return;
+        var nama=p.nama==='(tanpa nama di OSM)'?'Pulau tanpa nama':p.nama.replace(/^Pulau /,'P. ');
+        if(p.kode_kelas==='migas') nama+=' (migas)';
+        label.push(pasang([p.lon_titik,p.lat_titik],esc(nama)+'<small>'+ang(p.n_bangunan,0)+' bangunan</small>','label-pulau','top',[0,10]));
+      });
+      function aturLabel(){
+        var z=map.getZoom();
+        labelKel.forEach(function(el){ el.style.display=z<11.3?'':'none'; });
+        labelDarat.forEach(function(el){ el.style.display=z<13?'':'none'; });
+        label.forEach(function(el){ el.style.display=z<11.3?'none':''; el.querySelector('small').style.display=z<12.5?'none':''; });
+      }
+      map.on('zoom',aturLabel); aturLabel();
+
+      // daftar SPPG
+      var layananPer={};
+      layanan.features.forEach(function(f){(layananPer[f.properties.sppg]=layananPer[f.properties.sppg]||[]).push(f.properties);});
+      function htmlSppg(p){
+        var l=(layananPer[p.nama]||[]).map(function(x){return esc(x.pulau_layanan==='(tanpa nama di OSM)'?'pulau tanpa nama':x.pulau_layanan)+' ('+ang(x.jarak_km)+' km'+(x.di_luar_6km?', di luar 6 km':'')+')';}).join('; ');
+        return '<b>'+esc(p.nama)+'</b><br>Kel. '+esc(p.kelurahan)+', Kec. '+esc(p.kecamatan)+
+          '<br>Mulai: '+esc(p.mulai)+'<br>Penerima: '+esc(p.penerima)+' · Relawan: '+esc(p.relawan)+
+          (l?'<br>Pulau layanan lain: '+l:'')+
+          '<br>Status: '+esc(TEKS_VER[p.kode_verifikasi])+'<br><small>Sumber: '+esc(p.sumber)+'. Titik = pusat pulau (perkiraan).</small>';
+      }
+      var ol=document.getElementById('daftar');
+      var urut=sppg.features.slice().sort(function(a,b){return b.geometry.coordinates[1]-a.geometry.coordinates[1];});
+      urut.forEach(function(f){
+        var p=f.properties, li=document.createElement('li'), b=document.createElement('button');
+        b.style.borderLeftColor=WARNA_VER[p.kode_verifikasi];
+        b.innerHTML='<span>'+esc(p.nama.replace(/^SPPG /,''))+'</span><span class="status">'+(p.kode_verifikasi==='belum'?'belum terverifikasi':'Kel. '+esc(p.kelurahan))+'</span>';
+        b.addEventListener('click',function(){
+          map.flyTo({center:f.geometry.coordinates,zoom:13.2,padding:padding(),duration:900});
+          buka(f.geometry.coordinates,htmlSppg(p));
+          if(window.innerWidth<=640) tutup(true);
+        });
+        li.appendChild(b); ol.appendChild(li);
+      });
+
+      // klik
+      function klik(id,fn){
+        map.on('click',id,function(e){ e.preventDefault(); fn(e.features[0].properties,e.lngLat,e.features[0]); });
+        map.on('mouseenter',id,function(){map.getCanvas().style.cursor='pointer';});
+        map.on('mouseleave',id,function(){map.getCanvas().style.cursor='';});
+      }
+      var sudah=false;
+      map.on('click',function(){sudah=false;});
+      function sekali(fn){return function(p,ll,f){ if(sudah) return; sudah=true; fn(p,ll,f); };}
+      // urutan pendaftaran = prioritas (lapisan teratas dulu)
+      klik('sppg',sekali(function(p,ll,f){buka(f.geometry.coordinates,htmlSppg(p));}));
+      klik('dermaga',sekali(function(p,ll,f){buka(f.geometry.coordinates,'<b>'+esc(p.nama)+'</b><br>'+esc(p.jenis)+'<br>'+esc(p.lokasi)+'<br><small>Sumber: '+esc(p.sumber)+'</small>');}));
+      klik('layanan',sekali(function(p,ll){buka(ll,'<b>'+esc(p.sppg)+'</b> ke '+esc(p.pulau_layanan==='(tanpa nama di OSM)'?'pulau tanpa nama':p.pulau_layanan)+'<br>Jarak titik SPPG ke tepi pulau: '+ang(p.jarak_km)+' km<br>'+esc(p.status_radius)+'<br><small>'+ang(p.n_bangunan,0)+' bangunan di pulau layanan. Asumsi: pulau satu kelurahan.</small>');}));
+      function htmlRute(p){return '<b>'+esc(p.rute)+'</b><br>'+esc(p.layanan)+'<br>Panjang garis lurus: '+ang(p.panjang_km)+' km<br><small>Skematik, bukan lintasan kapal. Perlu dicocokkan dengan jadwal Dishub DKI.</small>';}
+      klik('rute-lanjut',sekali(function(p,ll){buka(ll,htmlRute(p));}));
+      klik('rute',sekali(function(p,ll){buka(ll,'<b>'+esc(p.rute)+'</b><br>'+esc(p.layanan)+'<br>Panjang garis lurus: '+ang(p.panjang_km)+' km<br><small>Skematik, bukan lintasan kapal. Perlu dicocokkan dengan jadwal Dishub DKI.</small>');}));
+      function htmlPulau(p){
+        return '<b>'+esc(p.nama)+'</b><br>'+(p.kelurahan?'Kel. '+esc(p.kelurahan)+', Kec. '+esc(p.kecamatan):'Di luar batas kelurahan OSM')+
+          '<br>Kelas: '+esc(p.kelas)+'<br>Bangunan: '+ang(p.n_bangunan,0)+' (luas atap '+ang(p.luas_bangunan_m2/10000,2)+' ha)'+
+          '<br>Luas pulau (OSM): '+ang(p.luas_ha)+' ha'+
+          '<br>Lampu malam VIIRS (nW/cm²/sr): 2023 '+ang(p.ntl_2023,2)+' · 2024 '+ang(p.ntl_2024,2)+' · 2025 '+ang(p.ntl_2025,2)+
+          '<br><small>Piksel VIIRS ±500 m, kasar untuk pulau kecil. Pakai sebagai indikasi tren saja.</small>';
+      }
+      klik('titik',sekali(function(p,ll,f){buka(f.geometry.coordinates,htmlPulau(p));}));
+      klik('pulau',sekali(function(p,ll){buka(ll,htmlPulau(p));}));
+
+      map.fitBounds(AWAL,{padding:padding(),duration:0});
+    }).catch(function(err){ console.error(err); });
+  }
+  if(map.isStyleLoaded()) mulai(); else map.once('style.load',mulai);
+
+  function tekan(id,on){document.getElementById(id).setAttribute('aria-pressed',on?'true':'false');}
+  document.getElementById('b-peta').onclick=function(){
+    map.setLayoutProperty('peta','visibility','visible'); map.setLayoutProperty('satelit','visibility','none');
+    document.body.classList.remove('satelit'); tekan('b-peta',true); tekan('b-satelit',false);
+  };
+  document.getElementById('b-satelit').onclick=function(){
+    map.setLayoutProperty('satelit','visibility','visible'); map.setLayoutProperty('peta','visibility','none');
+    document.body.classList.add('satelit'); tekan('b-peta',false); tekan('b-satelit',true);
+  };
+  var semua=false;
+  document.getElementById('b-semua').onclick=function(){
+    semua=!semua; tekan('b-semua',semua);
+    map.fitBounds(semua?SEMUA:AWAL,{padding:padding(),duration:900});
+  };
+  function warna(mode){
+    var e=mode==='kec'?EKS_KEC:EKS_KELAS;
+    map.setPaintProperty('pulau','fill-color',e); map.setPaintProperty('titik','circle-color',e);
+    tekan('b-kelas',mode!=='kec'); tekan('b-kec',mode==='kec');
+    document.getElementById('leg-kelas').hidden=mode==='kec'; document.getElementById('leg-kec').hidden=mode!=='kec';
+  }
+  document.getElementById('b-kelas').onclick=function(){warna('kelas');};
+  document.getElementById('b-kec').onclick=function(){warna('kec');};
+  var rad=false;
+  document.getElementById('b-radius').onclick=function(){
+    rad=!rad; tekan('b-radius',rad);
+    map.setLayoutProperty('radius-garis','visibility',rad?'visible':'none');
+  };
+  var panel=document.getElementById('panel'), lipat=document.getElementById('lipat');
+  function tutup(t){ panel.classList.toggle('tertutup',t); document.body.classList.toggle('panel-tutup',t); lipat.textContent=t?'Buka':'Tutup'; lipat.setAttribute('aria-expanded',t?'false':'true'); }
+  lipat.onclick=function(){ tutup(!panel.classList.contains('tertutup')); };
+})();
+</script>
+</body>
+</html>

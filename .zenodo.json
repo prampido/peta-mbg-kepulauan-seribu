@@ -1,0 +1,36 @@
+{
+  "title": "Peta Interaktif Jaringan Pasok dan SPPG Program Makan Bergizi Gratis di Kabupaten Administrasi Kepulauan Seribu",
+  "upload_type": "dataset",
+  "description": "<p>Data spasial dan peta interaktif tujuh Satuan Pelayanan Pemenuhan Gizi (SPPG) Program Makan Bergizi Gratis, pulau layanannya, dermaga, dan rute kapal ke daratan Jakarta di Kabupaten Administrasi Kepulauan Seribu, 2024–2026. Berisi 110 poligon pulau dengan jumlah bangunan (Google Open Buildings v3) dan lampu malam VIIRS 2023–2025, batas kecamatan dan kelurahan, titik SPPG dengan status verifikasi sumber, dermaga, rute skematik, serta hubungan SPPG ke pulau layanan dengan radius 6 km.</p><p>Batasan: titik SPPG adalah pusat pulau (perkiraan); SPPG Tidung dan Pari belum terverifikasi di Radar MBG Badan Gizi Nasional; rute adalah garis lurus antar-dermaga, bukan lintasan kapal.</p><p>Peta interaktif: <a href=\"https://prampido.github.io/peta-mbg-kepulauan-seribu/\">https://prampido.github.io/peta-mbg-kepulauan-seribu/</a></p><p>English summary: spatial data and an interactive map of the seven school-meal kitchens (SPPG) of Indonesia's Free Nutritious Meals programme in the Thousand Islands Regency, Jakarta, with island building counts, VIIRS night lights, piers, and schematic boat routes to the mainland.</p>",
+  "creators": [
+    {
+      "name": "Pido, Pramono Putra S.",
+      "affiliation": "Department of Geography, Faculty of Mathematics and Natural Sciences, Universitas Indonesia",
+      "orcid": "0009-0001-7759-2150"
+    }
+  ],
+  "access_right": "open",
+  "license": "odbl-1.0",
+  "language": "ind",
+  "version": "pram-v1.0.0",
+  "keywords": [
+    "Makan Bergizi Gratis",
+    "SPPG",
+    "Kepulauan Seribu",
+    "school feeding",
+    "small islands",
+    "food supply network",
+    "accessibility",
+    "OpenStreetMap",
+    "Google Open Buildings",
+    "VIIRS"
+  ],
+  "related_identifiers": [
+    {"identifier": "https://prampido.github.io/peta-mbg-kepulauan-seribu/", "relation": "isDocumentedBy"},
+    {"identifier": "https://www.openstreetmap.org", "relation": "isDerivedFrom"},
+    {"identifier": "10.48550/arXiv.2107.12283", "relation": "cites"},
+    {"identifier": "10.3390/rs13050922", "relation": "cites"},
+    {"identifier": "10.1016/j.rse.2017.06.031", "relation": "cites"}
+  ],
+  "notes": "Data (folder data/) berlisensi ODbL 1.0 karena diturunkan dari OpenStreetMap. Teks dan index.html berlisensi CC BY 4.0. MapLibre GL JS di folder lib/ berlisensi BSD-3-Clause."
+}

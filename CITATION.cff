@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "Jika memakai data atau peta ini, kutip sebagai berikut."
+type: dataset
+title: "Peta Interaktif Jaringan Pasok dan SPPG Program Makan Bergizi Gratis di Kabupaten Administrasi Kepulauan Seribu"
+authors:
+  - family-names: "Pido"
+    given-names: "Pramono Putra S."
+    orcid: "https://orcid.org/0009-0001-7759-2150"
+    affiliation: "Department of Geography, Faculty of Mathematics and Natural Sciences, Universitas Indonesia"
+version: pram-v1.0.0
+date-released: 2026-11-23
+license: ODbL-1.0
+url: "https://prampido.github.io/peta-mbg-kepulauan-seribu/"
+repository-code: "https://github.com/prampido/peta-mbg-kepulauan-seribu"
+keywords:
+  - Makan Bergizi Gratis
+  - SPPG
+  - Kepulauan Seribu
+  - school feeding
+  - small islands
+abstract: "Data spasial dan peta interaktif tujuh SPPG Program Makan Bergizi Gratis, pulau layanannya, dermaga, dan rute kapal ke daratan Jakarta di Kabupaten Administrasi Kepulauan Seribu, 2024–2026."
